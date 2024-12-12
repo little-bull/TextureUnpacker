@@ -218,6 +218,11 @@ class TextureUnpackerApp:
         self.image_displayed = None  # 清除对图片的引用，防止异常
         self.drop_area.config(image="", text="Drop a plist here or select one.")  # 设置空字符串代替 None
         self.drop_area.bind("<Button-1>", self.select_files)  # 重新绑定拖拽区域
+        # 获取所有根节点的ID
+        for item in self.plist_treeview.get_children():
+            self.plist_treeview.delete(item)
+        self.split_images = []
+
 
     def showTip(self, message, title = "waring"):
         """在屏幕中央显示一个美观的提示对话框，3秒后自动消失"""
