@@ -110,6 +110,57 @@ class TextureUnpackerApp:
         self.scrollbar.pack(side="right", fill="y")
         self.plist_treeview.config(yscrollcommand=self.scrollbar.set)
 
+        # 绑定双击事件以启用编辑功能
+        # self.plist_treeview.bind("<Double-1>", self.on_item_double_click)
+
+    def on_item_double_click(self, event):
+        # 获取双击的项
+        item = self.plist_treeview.identify('item', event.x, event.y)
+
+        # 获取当前的值
+        old_value = self.plist_treeview.item(item, "values")[0]
+
+        # 创建一个弹出窗口
+        self.edit_dialog(item, old_value)
+
+    def edit_dialog(self, item, old_value):
+        # 创建一个新的窗口
+        dialog = tk.Toplevel(self.root)
+        dialog.title("Edit Item")
+
+        # 创建标签
+        label = tk.Label(dialog, text="Edit Name:")
+        label.pack(padx=10, pady=5)
+
+        # 创建输入框并设置初始值
+        entry = tk.Entry(dialog)
+        entry.insert(0, old_value)
+        entry.pack(padx=10, pady=5)
+
+        # 创建确认按钮
+        def confirm():
+            new_value = entry.get()
+            self.plist_treeview.item(item, values=(new_value,))
+            dialog.destroy()
+
+        # 创建取消按钮
+        def cancel():
+            dialog.destroy()
+
+        # 确认按钮
+        confirm_button = tk.Button(dialog, text="Confirm", command=confirm)
+        confirm_button.pack(side="left", padx=10, pady=5)
+
+        # 取消按钮
+        cancel_button = tk.Button(dialog, text="Cancel", command=cancel)
+        cancel_button.pack(side="right", padx=10, pady=5)
+
+        # 绑定回车键（Enter）到确认按钮
+        dialog.bind("<Return>", lambda event: confirm())
+
+        # 绑定关闭窗口时的操作
+        dialog.protocol("WM_DELETE_WINDOW", cancel)
+
     def set_convert_button(self, enable):
         if enable:
            self.convert_jpg_btn.config(state="normal", bg="#007AFF")
@@ -222,6 +273,17 @@ class TextureUnpackerApp:
         for item in self.plist_treeview.get_children():
             self.plist_treeview.delete(item)
         self.split_images = []
+
+        self.plist_entry.config(state="normal")
+        self.plist_entry.delete(0, tk.END)
+        self.plist_entry.insert(0, "")
+        self.plist_entry.config(state="disabled")
+
+        self.texture_entry.config(state="normal")
+        self.texture_entry.delete(0, tk.END)
+        self.texture_entry.insert(0, "")
+        self.texture_entry.config(state="disabled")
+
 
 
     def showTip(self, message, title = "waring"):
